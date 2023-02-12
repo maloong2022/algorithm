@@ -1,16 +1,18 @@
-### 性质
+### 链表
+
+#### 性质
 
 - 内存可以不连续
 - 插入删除快，查询慢
 - 占用空间单链表是数组的两倍(需要存放 next 指针)，双链表为三倍。
 
-### 关键点
+#### 关键点
 
 - 熟练离散结点的结构设计
 - 单向/双向链表的插入，删除等操作模版
 - 清楚保护结点的运用
 
-### 时间复杂度
+#### 时间复杂度
 
 | 操作                                                                       | 复杂度 |
 | -------------------------------------------------------------------------- | ------ |
@@ -519,70 +521,6 @@ class Solution {
         }
         cur.next = list1==null?list2:list1;
         return protect.next;
-    }
-}
-```
-
-66. Plus One
-
-You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
-
-Increment the large integer by one and return the resulting array of digits.
-
-Example 1:
-
-```
-Input: digits = [1,2,3]
-Output: [1,2,4]
-Explanation: The array represents the integer 123.
-Incrementing by one gives 123 + 1 = 124.
-Thus, the result should be [1,2,4].
-```
-
-Example 2:
-
-```
-Input: digits = [4,3,2,1]
-Output: [4,3,2,2]
-Explanation: The array represents the integer 4321.
-Incrementing by one gives 4321 + 1 = 4322.
-Thus, the result should be [4,3,2,2].
-```
-
-Example 3:
-
-```
-Input: digits = [9]
-Output: [1,0]
-Explanation: The array represents the integer 9.
-Incrementing by one gives 9 + 1 = 10.
-Thus, the result should be [1,0].
-```
-
-Constraints:
-
-1 <= digits.length <= 100
-
-0 <= digits[i] <= 9
-
-digits does not contain any leading 0's.
-
-```java
-class Solution {
-    public int[] plusOne(int[] digits) {
-       int size = digits.length;
-       for (int i = size-1;i>=0;i--){
-          int temp = digits[i]+1;
-          if(temp <= 9){
-            digits[i] = temp;
-            return digits;
-          }else {
-            digits[i] = 0;
-        }
-       }
-       int[] newDigits = new int[size+1];
-       newDigits[0] = 1;
-       return newDigits;
     }
 }
 ```

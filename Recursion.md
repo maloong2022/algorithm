@@ -2,33 +2,43 @@
 
 ![](https://photos.google.com/photo/AF1QipOubQwE4tppCGp0N4wrQsILuA9WEwMQaHnvYAkn)
 
+递推：从小的 i-1 通过 for 循环和递推公式，推导出 i 的方式，递推公式往往比较难找和归纳。
+
+递归（recursion）的本质，往下去探寻：
+
+函数自己调用自己；
+
+通过自相似的函数体，进行重复。
+
 递归的三个关键：
 
-- 定义需要递归的问题（重叠子问题）--数学归纳法思维
-- 确定递归边界
-- 保护与还原现场（函数外部的变量，非局部变量）
+- 定义需要递归的问题（重叠子问题）相似重叠的子问题，需要递归什么--数学归纳法思维
+- 确定递归边界，即终止条件。
+- 保护与还原现场（针对非局部共享状态变量，非必须）
 
 代码模版
 
 ```java
-void recursion(int level, int param){
-    //terminator
-    if (level>MAX_LEVEL){
-        //process result
-        return;
-    }
+void recursion(int level, int param) {
+	// 边界
+     if (level > MAX_LEVEL) {
+           // 终止
+           return
+     }
 
-    // process logic in current level
-    process(level, param);
+     // 处理当前递归函数栈的逻辑
+     process(level, param)
 
-    // drill down
-    recursion(level+1, new_param);
+     // 递归调用
+     recursion(level + 1, new_param)
 
-    // restore the current level status
+     // 还原现场（非必须，回溯的核心）
 }
 ```
 
 #### 实战
+
+**子集**（选或不选，任意个）
 
 78. Subsets
 
@@ -79,16 +89,19 @@ class Solution {
             return;
         }
         // the process of the current recursion
-        // chosen the index i of the nums
+
+        // 1.not chosen the nums
         recur(i+1);
+        // 2.chosen the index i of the nums
         chosen.push(numsArr[i]);
-        // not chosen the nums
         recur(i+1);
         // pop to come back the condition of recursion
         chosen.pop();
     }
 }
 ```
+
+**组合**（选或不选，选 K 个）
 
 77. Combinations
 
@@ -142,10 +155,10 @@ class Solution {
         }
 
         // process of the current recursion
-        // 1. chose i
+        // 1. not chose i
         recursion(i+1);
+        // 2. chose i
         chosen.push(i);
-        // 2. not chose i
         recursion(i+1);
 
         // clear current recursion's effection
@@ -155,6 +168,8 @@ class Solution {
 ```
 
 组合型就是一个子集型加上剪枝！
+
+**排列**（拿一个，只拿一次）
 
 46. Permutations
 
@@ -224,6 +239,140 @@ class Solution {
                 used[i] = false;
             }
         }
+    }
+}
+```
+
+47. Permutations II
+
+Given a collection of numbers, nums, that might contain duplicates, return all possible unique permutations in any order.
+
+Example 1:
+
+```
+Input: nums = [1,1,2]
+Output:
+[[1,1,2],
+ [1,2,1],
+ [2,1,1]]
+```
+
+Example 2:
+
+```
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+Constraints:
+
+- 1 <= nums.length <= 8
+- -10 <= nums[i] <= 10
+
+```java
+class Solution {
+
+    List<List<Integer>> ans;
+    Stack<Integer> chosen;
+    int n;
+    int[] numsArr;
+    boolean[] used;
+
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        this.n = nums.length;
+        this.numsArr = nums;
+        chosen = new Stack<>();
+        ans = new ArrayList<>();
+        used = new boolean[n];
+         // 全排列2的专属逻辑，对nums进行排序
+        Arrays.sort(nums);
+        recursion(0);
+        return ans;
+
+    }
+
+    public void recursion(int pos){
+        if (pos == n) {
+            ans.add(new ArrayList<>(chosen));
+            return;
+        }
+        for(int i=0;i<n;i++){
+            // 如果i-1这个位置没有被使用过，并且当前元素和i-1一样，说明存在重复
+            // 从左往右第一个未被填过的数字
+            // 即整个数组的状态其实是保证了 [未填入，未填入，未填入]到 [填入，未填入，未填入]
+            if((i>0 && numsArr[i] == numsArr[i-1] && !used[i-1])){
+                continue;
+            }
+            if(!used[i]){
+                chosen.push(numsArr[i]);
+                used[i] = true;
+                recursion(pos+1);
+                used[i] = false;
+                chosen.pop();
+            }
+        }
+    }
+}
+```
+
+236. Lowest Common Ancestor of a Binary Tree
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+
+Example 1:
+
+![](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+Output: 3
+Explanation: The LCA of nodes 5 and 1 is 3.
+```
+
+Example 2:
+
+![](https://assets.leetcode.com/uploads/2018/12/14/binarytree.png)
+
+```
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+Output: 5
+Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+```
+
+Example 3:
+
+```
+Input: root = [1,2], p = 1, q = 2
+Output: 1
+```
+
+Constraints:
+
+- The number of nodes in the tree is in the range [2, 105].
+- -109 <= Node.val <= 109
+- All Node.val are unique.
+- p != q
+- p and q will exist in the tree.
+
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        // 如果root为空，或者为p，或者为q，直接返回root
+        if(root == null || root == p || root == q) return root;
+        // 分拆子问题，分别看左子树和右子树，是否包含p或者q
+        // 使用DFS思想，一直探查到最底层，但凡下一层满足以下四种情况的任意一种都可以直接返回
+        TreeNode left = lowestCommonAncestor(root.left,p,q);
+        TreeNode right = lowestCommonAncestor(root.right,p,q);
+        // 第一种情况，左子树不包含p，q，右子树也不包含，直接返回空
+        if(left == null && right == null) return null;
+        // 第二种情况，左子树不包含，右子树包含，返回右子树
+        if(left == null ) return right;
+        // 第三种情况，右子树不包含，左子树包含，返回左子树
+        if(right == null) return left;
+        // 第四种情况，左右子树都包含p或者q
+        return root;
     }
 }
 ```
@@ -521,14 +670,15 @@ class Solution {
 
 ### 分治
 
-分治，即分而治之。
-
-就是把原问题划分成若干个同类子问题，分别解决后，再把结果合并起来
+分而治之，把原问题分成若干子问题，分别解决后（往往有结果集），把结果集合并起来。
 
 关键点：
 
-- 原问题和各个子问题都是重复的（同类的）-- 递归定义
-- 除了向下递归“问题”，还要向上合并“结果”
+- 定义出递归状态树；
+-
+- 原问题和子问题类似（往往是同一类问题）；
+-
+- 向下递归完毕后，并不是回溯暴力尝试，而是向上合并结果集。
 
 分治算法一般用递归实现
 
@@ -638,3 +788,175 @@ class Solution {
 ```
 
 ![](https://photos.google.com/photo/AF1QipPStuoyIJ_o6laBy0ReurH5_8oWu-bc7bYnQXse)
+
+23. Merge k Sorted Lists
+
+You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
+
+Merge all the linked-lists into one sorted linked-list and return it.
+
+Example 1:
+
+```
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+```
+
+Example 2:
+
+```
+Input: lists = []
+Output: []
+```
+
+Example 3:
+
+```
+Input: lists = [[]]
+Output: []
+```
+
+Constraints:
+
+- k == lists.length
+- 0 <= k <= 104
+- 0 <= lists[i].length <= 500
+- -104 <= lists[i][j] <= 104
+- lists[i] is sorted in ascending order.
+- The sum of lists[i].length will not exceed 104.
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        // 特殊情况，直接处理，提高性能
+        if(lists == null || lists.length == 0){
+            return null;
+        }
+
+        // 优先队列（默认是最小堆，最小值在顶部，每次出列都是最小值）
+        PriorityQueue<ListNode> queue = new PriorityQueue<>((v1,v2)-> v1.val - v2.val);
+
+        for(ListNode node: lists){
+            // 注意过滤空结点
+            if(node!=null){
+                queue.add(node);
+            }
+        }
+
+        // 组装链表
+        ListNode protect = new ListNode(0);
+        ListNode tail = protect;
+        while(!queue.isEmpty()){
+            ListNode curNode = queue.poll();
+            tail.next = curNode;
+            tail = tail.next;
+            //  如果链表结点的下一个结点不为空，需要继续放入优先队列，借助最小堆能力
+                if(curNode.next != null){
+                    queue.add(curNode.next);
+                }
+        }
+        return protect.next;
+    }
+}
+
+```
+
+169. Majority Element
+
+Given an array nums of size n, return the majority element.
+
+The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+Example 1:
+
+```
+Input: nums = [3,2,3]
+Output: 3
+```
+
+Example 2:
+
+```
+Input: nums = [2,2,1,1,1,2,2]
+Output: 2
+```
+
+Constraints:
+
+- n == nums.length
+- 1 <= n <= 5 \* 104
+- -109 <= nums[i] <= 109
+
+Follow-up: Could you solve the problem in linear time and in O(1) space?
+
+解题思路
+
+模板虽然可以通用分治的模板，但是还是要能够利用数学思维，对题目进行抽象
+
+证明:
+
+如果数 a 是数组 nums 的众数，如果我们将 nums 分成两部分，那么 a 必定是至少一部分的众数
+
+反证法：
+
+假设 a 既不是左半部分的众数，也不是右半部分的众数，那么 a 出现的次数少于 l / 2 + r / 2 次，其中 l 和 r 分别是左半部分和右半部分的长度。由于 l / 2 + r / 2 <= (l + r) / 2，说明 a 也不是数组 nums 的众数，因此出现了矛盾。
+
+抽象成分治法的思路：
+
+讲数组的状态空间一分为二，将求当前数组的众数这个问题，分拆成求左右两个子数组的众数，最后将这两个子问题的答案，归并起来，决策出当前问题（数组）的众数
+
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+        return majorityElementRec(nums,0,nums.length-1);
+    }
+
+    int countInRange(int[] nums, int num, int lo, int hi){
+        int count = 0;
+        for(int i = lo;i<=hi;i++){
+            if(nums[i] == num) count++;
+        }
+        return count;
+    }
+
+    int majorityElementRec(int[] nums, int lo, int hi){
+        // 递归终止条件，如果当前的下界和上界一样，直接返回即可当前的数字的众数
+        if(lo==hi){
+            return nums[lo];
+        }
+        // 当前层的处理逻辑，计算下边界和上边界中位数，防止越界，不使用(hi+lo)/2
+        int mid = (hi-lo)/2 + lo;
+
+        // 分别获取左子问题和右子问题的众数left和right
+        int left = majorityElementRec(nums,lo,mid);
+        int right = majorityElementRec(nums,mid+1,hi);
+
+        // 合并逻辑，如果左边的众数和右边的达成了一致，直接返回任意一个即可
+        if(left==right) return left;
+
+        // 否则看谁是真正的众数
+        int leftCount = countInRange(nums,left,lo,hi);
+        int rightCount = countInRange(nums,right,lo,hi);
+
+        return leftCount > rightCount? left: right;
+    }
+}
+```
