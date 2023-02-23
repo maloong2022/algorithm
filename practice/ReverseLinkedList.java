@@ -1,8 +1,8 @@
 public class ReverseLinkedList {
 
-  public static ListNode reverseList(ListNode head){
+  public static ListNode reverseList(ListNode head) {
     ListNode last = null;
-   while(head != null){
+    while (head != null) {
       ListNode nextHead = head.next;
 
       head.next = last;
@@ -12,11 +12,11 @@ public class ReverseLinkedList {
     }
     return last;
   }
-  
-  public static void main(String[] args){
+
+  public static void main(String[] args) {
     ListNode one = LinkListUtils.createLinkList();
-    System.out.print(LinkListUtils.printLinkedList(one)+" ===> ");
+    System.out.print(LinkListUtils.printLinkedList(one) + " ===> ");
     System.out.print(LinkListUtils.printLinkedList(reverseList(one)));
-    
+
   }
 }

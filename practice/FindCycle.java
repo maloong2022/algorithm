@@ -1,7 +1,7 @@
-public class FindCycle{
-  public static boolean hasCycle(ListNode head){
+public class FindCycle {
+  public static boolean hasCycle(ListNode head) {
     ListNode fast = head;
-    while(fast != null && fast.next != null){
+    while (fast != null && fast.next != null) {
       fast = fast.next.next;
       head = head.next;
       if (fast == head) {
@@ -11,10 +11,10 @@ public class FindCycle{
     return false;
   }
 
-  public static void main(String[] args){
+  public static void main(String[] args) {
 
     ListNode one = LinkListUtils.createCycleLinkList();
-    //LinkListUtils.printLinkedList(one);
+    // LinkListUtils.printLinkedList(one);
     System.out.println(hasCycle(one));
   }
 }

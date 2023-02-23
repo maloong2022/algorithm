@@ -1,13 +1,13 @@
 public class LinkListUtils {
 
-  public static String printLinkedList(ListNode head){
+  public static String printLinkedList(ListNode head) {
 
     if (head == null) {
       return null;
     }
     StringBuilder str = new StringBuilder();
     str.append("[");
-    while(head != null){
+    while (head != null) {
       str.append(head.val).append("->");
       head = head.next;
     }
@@ -15,7 +15,7 @@ public class LinkListUtils {
     return str.toString();
   }
 
-  public static ListNode createLinkList(){
+  public static ListNode createLinkList() {
     ListNode one = new ListNode(1);
     ListNode two = new ListNode(2);
     ListNode three = new ListNode(3);
@@ -29,7 +29,7 @@ public class LinkListUtils {
     return one;
   }
 
-  public static ListNode createCycleLinkList(){
+  public static ListNode createCycleLinkList() {
     ListNode one = new ListNode(3);
     ListNode two = new ListNode(2);
     ListNode three = new ListNode(0);
