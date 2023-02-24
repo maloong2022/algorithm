@@ -1,3 +1,9 @@
+### 树的遍历
+
+先序、中序、后序一般用递归来求，树的先序遍历又称树的深度优先遍历。
+
+层次序一般借助队列来求妈，树的层序遍历又称树的广度优先遍历。
+
 ### 实战
 
 #### 深度优先遍历
@@ -182,7 +188,7 @@ class Solution {
             Node node = seq.peek().getKey();
             // 取出层数，此时结点可以出列
             Integer  depth = seq.poll().getValue();
-            // 层数大于数组长度，说明要新开数组寸结点
+            // 层数大于数组长度，说明要新开数组存结点
             if (depth >= res.size()) res.add(new ArrayList());
             // 存储刚刚取出结点的值
             res.get(depth).add(node.val);
@@ -246,7 +252,9 @@ class Solution {
         while(inorder[mid]!= root.val) mid++;
         // 中序中l2 ~ (mid-1)就是左子树
         // 中序中 (mid + 1) ~ r2就是右子树
-        // 左子树先序起点，除去第一位根，l1+1，终点为：l1 + 左子树的个数：(mid - 1) - (l2) + 1
+        // 左子树先序起点，除去第一位根，l1+1，终点为：起点+ 个数 - 1（因为下标是从0开始的）
+        // 个数为： 终点 - 起点 + 1
+        // (l1 + 1) + [(mid - 1) - (l2) + 1 ]  - 1
         // 两点之间的个数等于末尾数-开始数 + 1
         root.left = build(l1 + 1, l1 + (mid - l2),l2, mid-1);
         // 右子树比较简单了
@@ -255,6 +263,69 @@ class Solution {
     }
 
 }
+```
+
+**终点 = 起点 + 个数 - 1；**
+**个数 = 终点 - 起点 + 1；**
+
+106. Construct Binary Tree from Inorder and Postorder Traversal
+
+Given two integer arrays inorder and postorder where inorder is the inorder traversal of a binary tree and postorder is the postorder traversal of the same tree, construct and return the binary tree.
+
+Example 1:
+
+![](https://assets.leetcode.com/uploads/2021/02/19/tree.jpg)
+
+```
+Input: inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
+Output: [3,9,20,null,null,15,7]
+```
+
+Example 2:
+
+```
+Input: inorder = [-1], postorder = [-1]
+Output: [-1]
+```
+
+Constraints:
+
+- 1 <= inorder.length <= 3000
+- postorder.length == inorder.length
+- -3000 <= inorder[i], postorder[i] <= 3000
+- inorder and postorder consist of unique values.
+- Each value of postorder also appears in inorder.
+- inorder is guaranteed to be the inorder traversal of the tree.
+- postorder is guaranteed to be the postorder traversal of the tree.
+
+```java
+class Solution {
+    private int[] inorder;
+    private int[] postorder;
+    public TreeNode buildTree(int[] inorder, int[] postorder) {
+        this.inorder = inorder;
+        this.postorder = postorder;
+        return build(0, inorder.length-1,0,postorder.length-1);
+    }
+
+    TreeNode build(int l1,int r1,int l2, int r2){
+        if(l1 > r1) return null;
+        TreeNode root = new TreeNode(postorder[r2]);
+        int mid = l1;
+         while(inorder[mid]!= root.val)mid++;
+        // 下面这种方式不行，因为没有记录找的过程，没有值的话mid不更新
+        // for(int i=0;i<r1;i++){
+        //     if(inorder[i] == root.val){
+        //         mid = i;
+        //         break;
+        //     }
+        // }
+        root.left = build(l1, mid-1,l2,l2+(mid-1-l1+1)-1);
+        root.right = build(mid+1,r1,l2+(mid-1-l1+1)-1+1,r2-1);
+        return root;
+    }
+}
+
 ```
 
 297. Serialize and Deserialize Binary Tree
@@ -402,7 +473,7 @@ public class Solution {
         for (int i = 0; i < n; i++) {
             depth.add(-1);
         }
-        // just the expend  aglor template
+        // just the level search aglor template
         q.add(start);
         depth.set(start, 0);
         while (!q.isEmpty()) {
@@ -484,7 +555,7 @@ branch has the node
 
 1. Depth aglor
 
-```c
+```c++
 /**
  * Definition for a binary tree node.
  * struct TreeNode {
@@ -556,3 +627,7 @@ class Solution {
     }
 }
 ```
+
+### 基环树
+
+向一棵树添加一条边，就形成了一个环，此时整个结构被称为基环树（preudotree/unicyclic graph）
